@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/slack-go/slack"
@@ -122,10 +124,48 @@ func buildMessages() []slack.MsgOption {
 				FooterIcon: "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png",
 			},
 			slack.Attachment{
-				Title:    "3rd attachment title",
-				Text:     "3rd attachment text",
-				Color:    "#0000ff",
-				ThumbURL: "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png",
+				// Title / Text は置いたら Blocks が使えなくなる
+				Color: "#0000ff",
+				Blocks: slack.Blocks{
+					BlockSet: []slack.Block{
+						slack.NewSectionBlock(
+							slack.NewTextBlockObject(
+								slack.MarkdownType,
+								fmt.Sprintf("This is a markdown\nnow is ... `%s`", time.Now().String()),
+								false,
+								false,
+							),
+							nil,
+							nil,
+						),
+						slack.NewContextBlock(
+							uuid.New().String(),
+							slack.NewTextBlockObject(
+								slack.PlainTextType,
+								"Context block",
+								false,
+								false,
+							),
+						),
+						slack.NewHeaderBlock(
+							slack.NewTextBlockObject(
+								slack.PlainTextType,
+								"Section block",
+								false,
+								false,
+							),
+						),
+						slack.NewImageBlock(
+							"https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png",
+							"Google",
+							"google",
+							&slack.TextBlockObject{
+								Type: "plain_text",
+								Text: "Google",
+							},
+						),
+					},
+				},
 			},
 		),
 	}
